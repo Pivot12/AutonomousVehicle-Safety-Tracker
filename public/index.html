@@ -109,6 +109,25 @@
   footer a{color:var(--muted);margin:0 8px}
   footer a:hover{color:var(--accent)}
 
+  /* tabs row holds the export button at the right */
+  .tabs{align-items:center}
+  .exportpdf{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-family:var(--head);font-size:12.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent);border-radius:999px;padding:7px 14px;cursor:pointer;transition:.12s;margin-bottom:6px}
+  .exportpdf:hover{background:var(--accent);color:#fff}
+  .exportpdf svg{width:14px;height:14px}
+  .exportpdf:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* multi-year hint */
+  .yearhint{font-size:11.5px;color:var(--dim);font-family:var(--mono)}
+
+  /* persistent attribution badge */
+  .attrib{position:fixed;right:14px;bottom:14px;z-index:50;display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;text-decoration:none;font-family:var(--mono);font-size:11px;font-weight:500;padding:5px 11px;border-radius:999px;box-shadow:0 2px 10px rgba(31,111,107,.28);opacity:.9;transition:.15s}
+  .attrib:hover{opacity:1;color:#fff}
+  .attrib svg{width:12px;height:12px;flex:0 0 auto}
+  @media(max-width:480px){.attrib{display:none}}
+
+  /* print-only header */
+  .printhead{display:none}
+
   @media(max-width:760px){
     .grid{grid-template-columns:1fr}
     .wrap{padding:22px 16px 64px}
@@ -119,6 +138,25 @@
     th,td{max-width:120px}
     .chartbox{height:260px}
     body{font-size:14px}
+    .exportpdf{margin-left:0}
+  }
+
+  @media print{
+    @page{margin:14mm}
+    body{background:#fff !important;font-size:12px}
+    .bg-layer,header,.tabs,.toolbar,.strip,.attrib,.reset,.topcta,
+    .exportpdf,.filternote,#exportPdf{display:none !important}
+    .wrap{max-width:100%;padding:0;margin:0}
+    .printhead{display:block;margin:0 0 14px;padding:0 0 12px;border-bottom:2px solid #1F6F6B}
+    .printhead .pt{font-family:var(--head);font-size:18px;font-weight:700;color:#15171C}
+    .printhead .ps{font-family:var(--mono);font-size:11px;color:#1F6F6B;margin-top:4px}
+    .printhead .pby{font-family:var(--mono);font-size:10px;color:#66707B;margin-top:6px}
+    .card,.stat{box-shadow:none !important;break-inside:avoid;page-break-inside:avoid}
+    .grid{display:block}
+    .card{margin-bottom:14px}
+    .chartbox{height:300px !important}
+    .tablescroll{max-height:none !important;overflow:visible !important}
+    a{color:#15171C !important;text-decoration:none}
   }
 </style>
 </head>
@@ -151,12 +189,18 @@
 <header>
   <div class="brand">
     <svg class="logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="AV Safety Tracker logo">
-      <path d="M24 3 L41 9 V23 C41 34 33 42 24 45 C15 42 7 34 7 23 V9 Z" fill="#FFFFFF" stroke="#1F6F6B" stroke-width="2"/>
-      <circle cx="24" cy="23" r="11" fill="none" stroke="#1F6F6B" stroke-width="1.4" opacity=".4"/>
-      <circle cx="24" cy="23" r="6.5" fill="none" stroke="#5B6B7B" stroke-width="1.4" opacity=".55"/>
-      <circle cx="24" cy="23" r="2.3" fill="#1F6F6B"/>
-      <line x1="24" y1="23" x2="35" y2="14" stroke="#1F6F6B" stroke-width="1.6"/>
-      <line x1="24" y1="23" x2="24" y2="11" stroke="#1F6F6B" stroke-width="1" opacity=".35"/>
+      <defs>
+        <linearGradient id="lgShield" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#27817C"/>
+          <stop offset="1" stop-color="#1A615D"/>
+        </linearGradient>
+      </defs>
+      <path d="M24 4 L40 9.6 V23.2 C40 33.4 32.9 40.9 24 44 C15.1 40.9 8 33.4 8 23.2 V9.6 Z" fill="url(#lgShield)"/>
+      <circle cx="24" cy="22.5" r="10.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity=".32"/>
+      <circle cx="24" cy="22.5" r="6" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity=".55"/>
+      <path d="M24 22.5 L33.4 15.4" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="24" cy="22.5" r="2.6" fill="#FFFFFF"/>
+      <circle cx="33.4" cy="15.4" r="2.1" fill="#C9A24B"/>
     </svg>
     <div>
       <div class="title">AV Safety Tracker</div>
@@ -171,6 +215,11 @@
 </header>
 
 <div class="wrap">
+  <div class="printhead" id="printHead" aria-hidden="true">
+    <div class="pt" id="printTitle">AV Safety Tracker</div>
+    <div class="ps" id="printSub"></div>
+    <div class="pby">Prepared by Neel Shah · linkedin.com/in/neelshah29 · Source: NHTSA SGO / CA DMV</div>
+  </div>
   <div class="strip">
     <span class="pill active">🇺🇸 US Coverage</span>
     <span>NHTSA SGO (federal, all states) + California DMV</span>
@@ -180,6 +229,10 @@
   <div class="tabs" role="tablist">
     <button class="tab on" data-view="nhtsa" type="button">NHTSA Crash Reports <span class="b">federal · live</span></button>
     <button class="tab" data-view="dmv" type="button">CA Disengagements <span class="b">2021–2025</span></button>
+    <button class="exportpdf" id="exportPdf" type="button" title="Export the current view as a PDF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Export PDF
+    </button>
   </div>
 
   <div id="viewNhtsa">
@@ -245,6 +298,7 @@
     <div class="yearbar">
       <span class="toollabel">Reporting year:</span>
       <span class="btnrow" id="yearButtons"></span>
+      <span class="yearhint">select one or more years</span>
     </div>
     <div class="stats" id="dmvStats"></div>
     <div class="grid">
@@ -275,9 +329,15 @@
   <div style="margin-top:8px">
     <a href="pro.html">Monthly brief</a>·
     <a href="privacy.html">Privacy</a>·
-    <a href="mailto:neelshah0147@gmail.com">Contact</a>
+    <a href="pro.html#contact">Contact</a>
   </div>
+  <div style="margin-top:10px;color:var(--dim)">Built by <a href="https://linkedin.com/in/neelshah29" target="_blank" rel="noopener">Neel Shah</a> · linkedin.com/in/neelshah29</div>
 </footer>
+
+<a class="attrib" href="https://linkedin.com/in/neelshah29" target="_blank" rel="noopener" aria-label="Neel Shah on LinkedIn">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM10 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.4c0-1.3 0-2.95-1.8-2.95s-2.08 1.4-2.08 2.85V21H10z"/></svg>
+  Neel Shah · linkedin.com/in/neelshah29
+</a>
 
 <script>
 /* ===== SHARED CONTRACT ===== */
@@ -556,7 +616,7 @@ function buildTable(cols, rows, sortState, onSort){
 
 /* ===================== CA DMV DISENGAGEMENTS TAB ===================== */
 let DMV=null, dmvInit=false, currentView="nhtsa";
-const dmvState={year:null};
+const dmvState={years:new Set()};
 const sortDmv={key:"ratePer1kMiles",dir:1};
 const dmvCharts={};
 
@@ -582,12 +642,18 @@ function rateColor(r){ return {good:"#2E7D5B",mid:"#C9A24B",bad:"#C0563B"}[rateB
 function initDmv(){
   if(!DMV||!DMV.byYear){ document.getElementById("dmvStats").innerHTML=`<div class="empty"><span class="big">Dataset not found</span>The processed file lives at data/caldmv_disengagements.json.</div>`; return; }
   const years=DMV.meta.yearsAvailable||Object.keys(DMV.byYear);
-  dmvState.year=years[years.length-1];
+  dmvState.years=new Set([years[years.length-1]]); // default: latest year only
   const yb=document.getElementById("yearButtons"); yb.innerHTML="";
   years.forEach(y=>{
     const b=document.createElement("button");
-    b.className="ybtn"+(y===dmvState.year?" on":""); b.type="button"; b.textContent=y;
-    b.onclick=()=>{ dmvState.year=y; document.querySelectorAll("#yearButtons .ybtn").forEach(x=>x.classList.toggle("on",x.textContent===y)); dmvRerender(); };
+    b.className="ybtn"+(dmvState.years.has(y)?" on":""); b.type="button"; b.textContent=y;
+    b.onclick=()=>{
+      if(dmvState.years.has(y)){
+        if(dmvState.years.size>1) dmvState.years.delete(y); // keep at least one year selected
+      } else { dmvState.years.add(y); }
+      document.querySelectorAll("#yearButtons .ybtn").forEach(x=>x.classList.toggle("on",dmvState.years.has(x.textContent)));
+      dmvRerender();
+    };
     yb.appendChild(b);
   });
   dmvCharts.rate=new Chart(document.getElementById("rateChart"),{type:"bar",
@@ -599,17 +665,48 @@ function initDmv(){
   dmvRerender();
 }
 
+// aggregate miles + disengagements per company across the selected years,
+// then recompute per-1,000-mi rate on the summed totals
+function dmvAggregate(){
+  const yearsAvail=DMV.meta.yearsAvailable||Object.keys(DMV.byYear);
+  const sel=yearsAvail.filter(y=>dmvState.years.has(y)); // preserve chronological order
+  const agg={};
+  sel.forEach(y=>{
+    (DMV.byYear[y]||[]).forEach(x=>{
+      const k=x.manufacturer;
+      if(!agg[k]) agg[k]={manufacturer:k, miles:0, disengagements:0};
+      agg[k].miles += (x.miles||0);
+      agg[k].disengagements += (x.disengagements||0);
+    });
+  });
+  const rows=Object.values(agg).map(r=>{
+    r.ratePer1kMiles = r.miles>0 ? +(r.disengagements/r.miles*1000).toFixed(3) : null;
+    return r;
+  });
+  return {rows, sel};
+}
+
+function dmvLabel(sel){
+  if(sel.length===1) return sel[0];
+  // contiguous range → compact "2021–2025", else comma list
+  const nums=sel.map(Number).sort((a,b)=>a-b);
+  const contiguous=nums.every((n,i)=>i===0||n===nums[i-1]+1);
+  return contiguous ? `${nums[0]}–${nums[nums.length-1]}` : sel.join(", ");
+}
+
 function dmvRerender(){
-  const rows=(DMV.byYear[dmvState.year]||[]).slice();
-  document.getElementById("dmvMeta").textContent=`${dmvState.year} · ${rows.length} companies`;
+  const {rows, sel}=dmvAggregate();
+  const label=dmvLabel(sel);
+  document.getElementById("dmvMeta").textContent=`${label} · ${rows.length} companies`;
   const miles=rows.reduce((a,x)=>a+(x.miles||0),0);
   const dis=rows.reduce((a,x)=>a+(x.disengagements||0),0);
   const fleetRate=miles>0?(dis/miles*1000):0;
   const top=rows.slice().sort((a,b)=>b.miles-a.miles)[0];
+  const yrLbl=sel.length>1?`${sel.length} yrs`:label;
   const ds=document.getElementById("dmvStats"); ds.innerHTML="";
   ds.append(
-    elFrag(`<div class="stat"><div class="n">${miles.toLocaleString()}</div><div class="l">Autonomous miles (${dmvState.year})</div></div>`),
-    elFrag(`<div class="stat"><div class="n">${dis.toLocaleString()}</div><div class="l">Total disengagements</div></div>`),
+    elFrag(`<div class="stat"><div class="n">${miles.toLocaleString()}</div><div class="l">Autonomous miles (${esc(label)})</div></div>`),
+    elFrag(`<div class="stat"><div class="n">${dis.toLocaleString()}</div><div class="l">Total disengagements (${esc(yrLbl)})</div></div>`),
     elFrag(`<div class="stat"><div class="n" style="color:${rateColor(fleetRate)}">${fleetRate.toFixed(3)}</div><div class="l">Fleet-wide rate / 1,000 mi</div></div>`),
     elFrag(`<div class="stat"><div class="n" style="font-size:${top&&top.manufacturer.length>14?'16px':'22px'}">${top?esc(top.manufacturer):"—"}</div><div class="l">Most miles (${top?top.miles.toLocaleString():0})</div></div>`)
   );
@@ -640,6 +737,16 @@ function renderDmvTable(rows){
     (key)=>{ if(sortDmv.key===key)sortDmv.dir*=-1; else {sortDmv.key=key;sortDmv.dir=key==="manufacturer"?1:-1;} renderDmvTable(rows); }
   ));
 }
+
+/* ===== EXPORT PDF (print current, filtered view) ===== */
+function updatePrintHead(){
+  const isDmv = currentView==="dmv";
+  document.getElementById("printSub").textContent = isDmv
+    ? "California DMV Disengagements" + (DMV ? " · "+(document.getElementById("dmvMeta").textContent||"") : "")
+    : "NHTSA ADS Crash Reports" + (DATA&&DATA.meta&&DATA.meta.dateRange ? " · "+DATA.meta.dateRange : "");
+}
+document.getElementById("exportPdf").onclick=()=>{ updatePrintHead(); window.print(); };
+window.addEventListener("beforeprint", updatePrintHead);
 
 load();
 loadDmv();

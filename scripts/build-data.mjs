@@ -39,7 +39,13 @@ function parseCSV(text) {
 
 // find a column index by trying candidate header substrings (case-insensitive)
 function findCol(headers, candidates) {
-  const h = headers.map((x) => x.toLowerCase());
+  const h = headers.map((x) => (x || "").trim().toLowerCase());
+  // exact match FIRST — prevents "State" matching "Source - State or Other Agency"
+  for (const cand of candidates) {
+    const idx = h.findIndex((x) => x === cand.toLowerCase());
+    if (idx !== -1) return idx;
+  }
+  // then fall back to substring match
   for (const cand of candidates) {
     const idx = h.findIndex((x) => x.includes(cand.toLowerCase()));
     if (idx !== -1) return idx;
@@ -123,7 +129,7 @@ const out = {
   byEntity: topN(byEntity, 15),
   bySeverity: topN(bySeverity, 10),
   byState: topN(byState, 15),
-  recent: recent.slice(0, 30),
+  recent: recent.slice(0, 200),
 };
 
 writeFileSync(join(OUT, "av_safety.json"), JSON.stringify(out, null, 2));

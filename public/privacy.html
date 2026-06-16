@@ -80,11 +80,18 @@
 <div class="wrap">
   <div class="top">
     <svg class="logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="AV Safety Tracker logo">
-      <path d="M24 3 L41 9 V23 C41 34 33 42 24 45 C15 42 7 34 7 23 V9 Z" fill="#FFFFFF" stroke="#1F6F6B" stroke-width="2"/>
-      <circle cx="24" cy="23" r="11" fill="none" stroke="#1F6F6B" stroke-width="1.4" opacity=".4"/>
-      <circle cx="24" cy="23" r="6.5" fill="none" stroke="#5B6B7B" stroke-width="1.4" opacity=".55"/>
-      <circle cx="24" cy="23" r="2.3" fill="#1F6F6B"/>
-      <line x1="24" y1="23" x2="35" y2="14" stroke="#1F6F6B" stroke-width="1.6"/>
+      <defs>
+        <linearGradient id="lgShield" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#27817C"/>
+          <stop offset="1" stop-color="#1A615D"/>
+        </linearGradient>
+      </defs>
+      <path d="M24 4 L40 9.6 V23.2 C40 33.4 32.9 40.9 24 44 C15.1 40.9 8 33.4 8 23.2 V9.6 Z" fill="url(#lgShield)"/>
+      <circle cx="24" cy="22.5" r="10.5" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity=".32"/>
+      <circle cx="24" cy="22.5" r="6" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity=".55"/>
+      <path d="M24 22.5 L33.4 15.4" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="24" cy="22.5" r="2.6" fill="#FFFFFF"/>
+      <circle cx="33.4" cy="15.4" r="2.1" fill="#C9A24B"/>
     </svg>
     <div>
       <div class="brandname">AV Safety Tracker</div>
@@ -129,7 +136,7 @@
 
   <div class="card">
     <h2><span class="dot"></span>Contact</h2>
-    <p>Questions about privacy, or want your contact details removed from our records? Email <a href="mailto:neelshah0147@gmail.com">neelshah0147@gmail.com</a> and we'll take care of it.</p>
+    <p>Questions about privacy, or want your contact details removed from our records? Use the <a href="pro.html#contact">contact form</a> and we'll take care of it.</p>
   </div>
 </div>
 
